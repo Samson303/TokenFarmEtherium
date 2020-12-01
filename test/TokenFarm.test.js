@@ -87,6 +87,18 @@ contract("TokenFarm", ([owner, investor]) => {
                 tokens("100"),
                 "investor staking balance is correct after staking"
             );
+
+            // Test Isueing Tokens
+            await tokenFarm.issueToken({ from: owner });
+            results = await dappToken.balanceOf(investor); // get the investors balance, they should have 100 tokens as its 1 : 1 farming
+            assert.equal(
+                results.toString(),
+                tokens("100"),
+                "The Investor recieved the dappTokens as a reward succesfully"
+            );
+
+            // Make sure that the contract owner is the only person that can call this function
+            await tokenFarm.issueToken({ from: investor }).should.be.rejected;
         });
     });
 });

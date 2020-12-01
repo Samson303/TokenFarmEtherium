@@ -44,6 +44,17 @@ mapping (address=> bool) public isStaking;
 
     //2. Unstake Tokens -- Withdraw Tokens 
 
+    function unStakeTokens() public {
+        uint balance = stakingBalance[msg.sender];
+        require(balance > 0, 'ammount being staked needs to be larger than 0'); // require is a method that allows the function to only work if the conditions are met
+        daiToken.transfer(msg.sender, balance);
+        //reset the balance staked 
+        stakingBalance[msg.sender] = 0;
+        isStaking[msg.sender] = false; 
+
+
+    }
+
     // 3. Issueing Tokens 
     function issueToken() public { // we want to loop through the array of people who have staked and reward them 
         require(msg.sender == owner, 'Must be contract owner for this method');

@@ -16,7 +16,7 @@ mapping (address=> bool) public hasStaked;
 mapping (address=> bool) public isStaking; 
 
 
-    constructor(DappToken _dappToken, DaiToken _daiToken) public {
+    constructor (DappToken _dappToken, DaiToken _daiToken) public {
         dappToken = _dappToken;
         daiToken = _daiToken;
         owner = msg.sender;
@@ -25,6 +25,9 @@ mapping (address=> bool) public isStaking;
     // 1. Stake the tokens  -- Deposit tokens 
 
     function stakeTokens (uint256 _ammount) public {
+        // Make sure the staking amount is more than 0
+        require(_ammount > 0, 'ammount being staked needs to be larger than 0'); // require is a method that allows the function to only work if the conditions are met
+        
         // Transfer the mdai to this contract 
         daiToken.transferFrom(owner, address(this), _ammount);
         //update Staking Balance 
@@ -34,14 +37,26 @@ mapping (address=> bool) public isStaking;
             stakers.push(msg.sender);
         }
 
+        // updates the status of the staking 
         hasStaked[msg.sender] = true; 
         isStaking[msg.sender] = true;  
     }
 
-    //2/. Unstake Tokens -- Withdraw Tokens 
+    //2. Unstake Tokens -- Withdraw Tokens 
 
     // 3. Issueing Tokens 
-
+    function issueToken() public { // we want to loop through the array of people who have staked and reward them 
+        require(msg.sender == owner, 'Must be contract owner for this method');
+        
+        for (uint i = 0; i < stakers.length; i++) {
+            address stakerAddress = stakers[i];
+            uint balance = stakingBalance[stakerAddress];
+           
+            if( balance > 0) {
+            dappToken.transfer(stakerAddress, balance); // staker gets 1 : 1 Dapp tokens from which they deposited mockDai for 
+            }
+        }
+    }
     //4. 
     
   
